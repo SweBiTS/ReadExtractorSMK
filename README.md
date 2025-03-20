@@ -22,6 +22,6 @@ Either update the file `supporting_files/tax_ids.txt` or supply your own file. T
 2) Make sure to go over the SLURM `config.yaml` in the slurm directory to make sure it fits your setup.
 
 ## Run the pipeline
-Open up a screen and run:
+Paste this into the terminal and run (hint: use screen):
 
 `snakemake --executor slurm --profile slurm --cores 1 --use-conda`
