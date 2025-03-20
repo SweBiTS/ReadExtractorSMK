@@ -4,7 +4,7 @@ import argparse
 import taxonomy
 import logging
 import gzip
-from stringmeup import taxonomy
+from stringmeup.taxonomy import TaxonomyTree
 from os import path
 
 logging.basicConfig(
@@ -124,7 +124,7 @@ def get_tax_ids(args):
 if __name__ == "__main__":
 
     # Initiate the taxonomy tree
-    taxonomy_tree = taxonomy.TaxonomyTree(names_filename=args.names, nodes_filename=args.nodes)
+    taxonomy_tree = TaxonomyTree(names_filename=args.names, nodes_filename=args.nodes)
 
     # Get which tax_ids that we are interested in
     supplied_tax_ids = get_tax_ids(args)
