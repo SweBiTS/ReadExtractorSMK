@@ -8,7 +8,7 @@ outdir: "output"
 logdir: "logs"
 
 # Change these as needed
-sample_pattern: "classification/{sample}_CLASSIFIED.k2.gz"        # The pattern of the Kraken 2 output files (determines the samples to process)
+sample_pattern: "classifications/{sample}_CLASSIFIED.k2.gz"        # The pattern of the Kraken 2 output files (determines the samples to process)
 fastq_file_pattern: "fastq/{sample}_unmapped_{direction}.fq.gz"   # The pattern of the fastq files to extract reads from
 taxonomy_names: "supporting_files/names.dmp"                      # Taxonomy names.dmp files (use the same as used for the Kraken 2 classification)
 taxonomy_nodes: "supporting_files/nodes.dmp"                      # Taxonomy nodes.dmp files (use the same as used for the Kraken 2 classification)
