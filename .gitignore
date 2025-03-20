@@ -17,6 +17,6 @@ input/fastq/*
 output/
 logs/
 
-# Ignore taxonomy files
+# Ignore anything user-related in the supporting_files folder (but keep the structure)
 supporting_files/*
-!supporting_files/tax_ids.txt
+!supporting_files/.gitkeep
