@@ -9,7 +9,6 @@ tax_ids_file = config['tax_ids_file']               # The file with all tax_ids 
 mode = config["mode"]                               # Should we get reads hitting only the specified tax_id, or its clade?
 names_file = config["taxonomy_names"]               # Path to the names file
 nodes_file = config["taxonomy_nodes"]               # Path to the nodes file
-subset_reads_path = config["subset_reads"]          # Path to subset_reads (script that fetches readIDs)
 k2_classification_file = config["sample_pattern"]   # The pattern of the Kraken 2 classification files. Just want to rename it for clarity here in the workflow
 fastq_file_pattern = config["fastq_file_pattern"]   # The pattern of the fastq files
 
