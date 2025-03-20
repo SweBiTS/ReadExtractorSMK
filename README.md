@@ -10,8 +10,9 @@ You need to supply the NCBI-style taxonomy files `names.dmp` and `nodes.dmp` tha
 Either supply paths to your taxonomy files in the `config.yaml`, or copy or create links to them in the folder `supporting_files`.
 
 ### Taxonomic IDs
-You need to supply the taxonomic ID(s) of the taxa or taxons for which you want to extract reads for.
-Either update the file `supporting_files/tax_ids.txt` or supply your own file. The file needs to have 1 tax ID per line.
+You need to supply the taxonomic ID(s) of the taxa or taxons for which you want to extract reads for. This is done in a simple text file.
+The pipeline is set up to look for taxonomic IDs in `supporting_files/tax_ids.txt`, so easiest for you is to just create that file and fill
+it with tax IDs. The file needs to have 1 tax ID per line. Alternatively, update the `config.yaml` to point to another file.
 
 ### Input files
 1) You need to populate the `input/classification` folder with the kraken 2 output classification files (symlinks are fine).
