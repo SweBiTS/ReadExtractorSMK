@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import taxonomy
 import logging
 import gzip
 from stringmeup.taxonomy import TaxonomyTree
