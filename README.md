@@ -1,10 +1,23 @@
 # ReadExtractorSMK
 Extract reads from fastq files based on Kraken 2 classifications.
 
-Currently this is tailored to work on **Dardel**. You just need to update the SLURM details in slurm/config.yaml if you want to use this pipeline somewhere else.
+This pipeline was created to run on a cluster with the SLURM Workload Manager and Conda package manager. Therefore this README is tailored towards that kind of environment.
+
+Currently this is tailored to work on the PDC cluster Dardel. You just need to update the SLURM details in `slurm/config.yaml` if you want to use this pipeline on another cluster.
 
 # Usage
 ## Before you run the pipeline
+### Snakemake
+Importantly, this pipeline was made to work with snakemake v8+.
+
+Here is a command for installing snakemake and the required slurm executor in its own conda environment:
+
+`conda create -c conda-forge -c bioconda -n snakemake snakemake snakemake-executor-plugin-slurm`
+
+Before running the pipeline, activate the environment:
+
+`conda activate snakemake`
+
 ### Taxonomy
 You need to supply the NCBI-style taxonomy files `names.dmp` and `nodes.dmp` that were used to create the Kraken 2 database used for classification.
 Either supply paths to your taxonomy files in the `config.yaml`, or copy or create links to them in the folder `supporting_files`.
