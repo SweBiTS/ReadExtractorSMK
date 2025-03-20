@@ -1,0 +1,14 @@
+# Ignore Snakemake working directory
+.snakemake/
+
+# Ignore any input files (but keep the file structure)
+input/*
+!input/*/.gitkeep
+
+# Ignore output and log directories
+output/
+logs/
+
+# Ignore taxonomy files
+supporting_files/*
+!supporting_files/tax_ids.txt
