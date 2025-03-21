@@ -28,7 +28,7 @@ The pipeline is set up to look for taxonomic IDs in `supporting_files/tax_ids.tx
 it with tax IDs. The file needs to have 1 tax ID per line. Alternatively, update the `config.yaml` to point to another file.
 
 ### Input files
-1) You need to populate the `input/classification` folder with the kraken 2 output classification files (symlinks are fine).
+1) You need to populate the `input/classifications` folder with the kraken 2 output classification files (symlinks are fine).
 2) You need to populate the `input/fastq` folder with the FASTQ files from which you want to extract reads from (symlinks are fine).
 
 ### Configs
