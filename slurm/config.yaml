@@ -15,7 +15,7 @@ default-resources:
 # Job-specific resources
 set-resources:
     getAll_taxID_readIDs:
-        runtime: "10m"
+        runtime: "30m"
         mem_mb: 3000
 
     extract_taxID_reads:
