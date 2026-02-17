@@ -24,12 +24,18 @@ tax_ids = read_tax_ids(tax_ids_file)
 if not tax_ids:
     raise ValueError(f"No tax IDs found in {tax_ids_file}. Check the file contents.")
 
+# Determine the status string based on the include flag
+# include: True -> "extracted"
+# include: False -> "filtered"
+status = "extracted" if config.get("include", True) else "filtered"
+
 # The fastq output files containing taxonomic ID-specific reads
 extracted_reads = expand(
-    str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_{direction}.fq.gz"),
+    str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_{status}_{direction}.fastq.gz"),
     mode=mode,
     sample=SAMPLES,
     tax_id=tax_ids,
+    status=status,
     direction=['R1', 'R2'])
 all_outputs.extend(extracted_reads)
 
@@ -68,13 +74,34 @@ rule extract_taxID_reads:
         allReadIDs = OUTDIR/"mode_{mode}/{sample}_allTaxIDs_readIDs.txt"
     output:
         taxon_readIDs = temp(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_readIDs.txt"),
-        R1 = OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_R1.fq.gz",
-        R2 = OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_R2.fq.gz"
+        R1 = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_R1.fastq.gz",
+        R2 = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_R2.fastq.gz"
+    params:
+        # Convert Python True/False to BBMap t/f
+        include_flag = "t" if config.get("include", True) else "f"
     log:
         LOGDIR / "extract_taxID_reads_{sample}_taxID-{tax_id}_{mode}.log"
+    threads: 4
+    resources:
+        mem_mb = 8000
     shell:
         """
+        # 1. Extract the specific IDs for this taxon from the master list
         awk -v taxid={wildcards.tax_id} -F '\t' '$2 == taxid {{print $3}}' {input.allReadIDs} > {output.taxon_readIDs}
-        /usr/bin/time -v sh -c 'seqtk subseq {input.R1} {output.taxon_readIDs} | gzip - > {output.R1}' 2>> {log}
-        /usr/bin/time -v sh -c 'seqtk subseq {input.R2} {output.taxon_readIDs} | gzip - > {output.R2}' 2>> {log}
+
+        # 2. Use BBMap to filter the reads.
+        # If include=t: only reads in taxon_readIDs are kept (Extraction)
+        # If include=f: all reads EXCEPT those in taxon_readIDs are kept (Filtering)
+        /usr/bin/time -v filterbyname.sh \
+            -Xmx{resources.mem_mb}m \
+            in={input.R1} \
+            in2={input.R2} \
+            out={output.R1} \
+            out2={output.R2} \
+            names={output.taxon_readIDs} \
+            include={params.include_flag} \
+            overwrite=f \
+            threads={threads} \
+            zl=6 \
+            2>&1 | tee -a {log}
         """
