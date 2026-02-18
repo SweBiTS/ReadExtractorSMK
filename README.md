@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="ReadExtractorSMK Logo" width="400">
+</p>
+
 # ReadExtractorSMK
 
 Extract or filter reads from fastq files based on Kraken 2 classifications.
@@ -47,8 +51,18 @@ The pipeline defaults to `supporting_files/tax_ids.txt`. Alternatively, update c
 
 ### Run the pipeline
 
+#### Cluster execution
+
 To handle varying memory requirements across different samples (especially for abundant clades), use the --restart-times flag. This allows the pipeline to automatically resubmit jobs with doubled memory if they hit a SLURM memory limit.
 
 Run the following command (hint: use screen or tmux):
 
 `snakemake --executor slurm --profile slurm --cores 1 --use-conda --restart-times 4`
+
+#### Local execution
+
+If you are running this on a standalone server instead of a cluster, you can bypass the SLURM executor. Snakemake will manage the cores and memory directly, just tell it how many cores and how much memory it has to work with.
+
+To run locally, use the following command:
+
+`snakemake --cores 64 --use-conda --restart-times 4 --resources mem_mb=1500000`
