@@ -1,6 +1,6 @@
 cluster:
   jobscript: "slurm-jobscript.sh"
-  submitcmd: "sbatch {dependencies}"
+  submitcmd: "sbatch --account={resources.slurm_account} --partition={resources.slurm_partition} --time={resources.runtime} --cpus-per-task={threads} --mem={resources.mem_mb}M {dependencies}"
 
 jobs: 500
 
@@ -8,9 +8,6 @@ jobs: 500
 default-resources:
     slurm_account: "hpc2n2026-053"
     slurm_partition: "batch"
-    runtime: "30m"
-    mem_mb: 2000
-    cpus_per_task: 2
 
 # Job-specific resources
 set-resources:
@@ -20,4 +17,3 @@ set-resources:
 
     extract_taxID_reads:
         runtime: "180m"
-        mem_mb: 6000

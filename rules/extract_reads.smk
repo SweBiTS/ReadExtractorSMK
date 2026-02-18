@@ -4,6 +4,10 @@
 Extract reads classified to certain tax_id(s) or clade(s) by Kraken 2.
 """
 
+def get_mem_mb(wildcards, attempt):
+    # Start at 4GB, double each time: 4, 8, 16, 32
+    return 4000 * (2 ** (attempt - 1))
+
 # Parameters from the configuration that we'll use
 tax_ids_file = config['tax_ids_file']               # The file with all tax_ids that we should extract reads from
 mode = config["mode"]                               # Should we get reads hitting only the specified tax_id, or its clade?
@@ -78,12 +82,14 @@ rule extract_taxID_reads:
         R2 = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_R2.fastq.gz"
     params:
         # Convert Python True/False to BBMap t/f
-        include_flag = "t" if config.get("include", True) else "f"
+        include_flag = "t" if config.get("include", True) else "f",
+        # Calculate Java heap as 90% of the allocated resource to avoid OOM-killing the JVM
+        java_mem = lambda wildcards, resources: int(resources.mem_mb * 0.9)
     log:
         LOGDIR / "extract_taxID_reads_{sample}_taxID-{tax_id}_{mode}.log"
     threads: 4
     resources:
-        mem_mb = 8000
+        mem_mb = get_mem_mb
     shell:
         """
         # 1. Extract the specific IDs for this taxon from the master list
@@ -93,7 +99,7 @@ rule extract_taxID_reads:
         # If include=t: only reads in taxon_readIDs are kept (Extraction)
         # If include=f: all reads EXCEPT those in taxon_readIDs are kept (Filtering)
         /usr/bin/time -v filterbyname.sh \
-            -Xmx{resources.mem_mb}m \
+            -Xmx{params.java_mem}m \
             in={input.R1} \
             in2={input.R2} \
             out={output.R1} \

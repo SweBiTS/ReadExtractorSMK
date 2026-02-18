@@ -4,7 +4,7 @@ Extract or filter reads from fastq files based on Kraken 2 classifications.
 
 This pipeline was created to run on a cluster with the SLURM Workload Manager and Conda package manager. Therefore this README is tailored towards that kind of environment.
 
-Currently this is tailored to work on the PDC cluster Dardel. You just need to update the SLURM details in `slurm/config.yaml` if you want to use this pipeline on another cluster.
+Currently this is tailored to work on the PDC cluster Dardel or HPC2N. You just need to update the SLURM details in `slurm/config.yaml` if you want to use this pipeline on another cluster.
 
 You can set the pipeline to extract reads classified to a specific taxon/clade, or to filter those reads and output all other reads.
 
@@ -14,7 +14,7 @@ You can set the pipeline to extract reads classified to a specific taxon/clade, 
 
 #### Snakemake
 
-Importantly, this pipeline was made to work with snakemake v8+.
+Importantly, this pipeline was made to work with **snakemake v8+**.
 
 Here is a command for installing snakemake and the required slurm executor in its own conda environment:
 
@@ -31,22 +31,24 @@ Either supply paths to your taxonomy files in the `config.yaml`, or copy or crea
 
 #### Taxonomic IDs
 
-You need to supply the taxonomic ID(s) of the taxa or taxons for which you want to extract reads for. This is done in a simple text file.
-The pipeline is set up to look for taxonomic IDs in `supporting_files/tax_ids.txt`, so easiest for you is to just create that file and fill
-it with tax IDs. The file needs to have 1 tax ID per line. Alternatively, update the `config.yaml` to point to another file.
+Supply the taxonomic ID(s) for which you want to extract/filter reads. This is a simple text file with one ID per line.
+
+The pipeline defaults to `supporting_files/tax_ids.txt`. Alternatively, update config.yaml to point to another file. The file needs to have 1 tax ID per line.
 
 #### Input files
 
-1) You need to populate the `input/classifications` folder with the kraken 2 output classification files (symlinks are fine).
-2) You need to populate the `input/fastq` folder with the FASTQ files from which you want to extract reads from (symlinks are fine).
+1) Populate `input/classifications` with the kraken 2 output classification files (symlinks are fine).
+2) Populate `input/fastq` with FASTQ files from which you want to extract/filter reads from (symlinks are fine).
 
 #### Configs
 
-1) Make sure to go over the pipeline `config.yaml` in the root directory to make sure it fits your setup.
-2) Make sure to go over the SLURM `config.yaml` in the slurm directory to make sure it fits your setup.
+1) **Pipeline** `config.yaml`: ensure paths and parameters (like mode and include) are correct.
+2) **SLURM** `slurm/config.yaml`: ensure project number and partition suits your slurm context.
 
 ### Run the pipeline
 
-Paste this into the terminal and run (hint: use screen):
+To handle varying memory requirements across different samples (especially for abundant clades), use the --restart-times flag. This allows the pipeline to automatically resubmit jobs with doubled memory if they hit a SLURM memory limit.
 
-`snakemake --executor slurm --profile slurm --cores 1 --use-conda`
+Run the following command (hint: use screen or tmux):
+
+`snakemake --executor slurm --profile slurm --cores 1 --use-conda --restart-times 4`
