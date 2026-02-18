@@ -8,6 +8,10 @@ def get_mem_mb(wildcards, attempt):
     # Start at 4GB, double each time: 4, 8, 16, 32
     return 4000 * (2 ** (attempt - 1))
 
+# Function to triple runtime: 30, 90, 270, 810 minutes
+def get_runtime(wildcards, attempt):
+    return 30 * (3 ** (attempt - 1))
+
 # Parameters from the configuration that we'll use
 tax_ids_file = config['tax_ids_file']               # The file with all tax_ids that we should extract reads from
 mode = config["mode"]                               # Should we get reads hitting only the specified tax_id, or its clade?
@@ -89,7 +93,8 @@ rule extract_taxID_reads:
         LOGDIR / "extract_taxID_reads_{sample}_taxID-{tax_id}_{mode}.log"
     threads: 4
     resources:
-        mem_mb = get_mem_mb
+        mem_mb = get_mem_mb,
+        runtime = get_runtime
     shell:
         """
         # 1. Extract the specific IDs for this taxon from the master list
