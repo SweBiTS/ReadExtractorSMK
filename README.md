@@ -6,7 +6,7 @@
 
 Extract or filter reads from fastq files based on Kraken 2 classifications.
 
-This pipeline was created to run on a cluster with the SLURM Workload Manager and Conda package manager. Therefore this README is tailored towards that kind of environment.
+This pipeline was created to run on a cluster with the SLURM Workload Manager and Conda package manager, but can be run locally as well.
 
 Currently this is tailored to work on the PDC cluster Dardel or HPC2N. You just need to update the SLURM details in `slurm/config.yaml` if you want to use this pipeline on another cluster.
 
