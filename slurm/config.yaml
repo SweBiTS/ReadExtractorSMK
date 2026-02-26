@@ -8,6 +8,8 @@ jobs: 1000
 default-resources:
     slurm_account: "hpc2n2026-053"
     slurm_partition: "batch"
+    runtime: "60m"
+    mem_mb: 4000
 
 # Job-specific resources
 set-resources:

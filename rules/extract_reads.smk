@@ -73,46 +73,49 @@ rule getAll_taxID_readIDs:
             2>&1 | tee {log}
         """
 
+rule extract_taxon_readIDs:
+    conda:
+        "../envs/extract_reads.yaml"
+    input:
+        allReadIDs = OUTDIR/"mode_{mode}/{sample}_allTaxIDs_readIDs.txt"
+    output:
+        taxon_readIDs = temp(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_readIDs.txt")
+    log:
+        LOGDIR / "extract_taxon_readIDs_{sample}_taxID-{tax_id}_{mode}.log"
+    threads: 1
+    resources:
+        mem_mb = 1000,
+        runtime = "15m"
+    shell:
+        """
+        awk -v taxid={wildcards.tax_id} -F '\t' '$2 == taxid {{print $3}}' {input.allReadIDs} > {output.taxon_readIDs} 2> {log}
+        """
+
 rule extract_taxID_reads:
     conda:
         "../envs/extract_reads.yaml"
     input:
-        R1 = lambda wildcards: INPUTDIR/fastq_file_pattern.format(sample=wildcards.sample, direction='R1'),
-        R2 = lambda wildcards: INPUTDIR/fastq_file_pattern.format(sample=wildcards.sample, direction='R2'),
-        allReadIDs = OUTDIR/"mode_{mode}/{sample}_allTaxIDs_readIDs.txt"
+        fastq = lambda wildcards: INPUTDIR/fastq_file_pattern.format(sample=wildcards.sample, direction=wildcards.direction),
+        taxon_readIDs = OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_readIDs.txt"
     output:
-        taxon_readIDs = temp(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_readIDs.txt"),
-        R1 = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_R1.fastq.gz",
-        R2 = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_R2.fastq.gz"
+        fastq = str(OUTDIR/"mode_{mode}/{tax_id}/{sample}_taxID-{tax_id}_") + status + "_{direction}.fastq.gz"
     params:
-        # Convert Python True/False to BBMap t/f
-        include_flag = "t" if config.get("include", True) else "f",
-        # Calculate Java heap as 90% of the allocated resource to avoid OOM-killing the JVM
-        java_mem = lambda wildcards, resources: int(resources.mem_mb * 0.9)
+        # include: True -> "" (keep matches)
+        # include: False -> "-v" (invert matches)
+        grep_flags = "" if config.get("include", True) else "-v",
     log:
-        LOGDIR / "extract_taxID_reads_{sample}_taxID-{tax_id}_{mode}.log"
+        LOGDIR / "extract_taxID_reads_{sample}_taxID-{tax_id}_{mode}_{direction}.log"
     threads: 4
     resources:
         mem_mb = get_mem_mb,
         runtime = get_runtime
     shell:
         """
-        # 1. Extract the specific IDs for this taxon from the master list
-        awk -v taxid={wildcards.tax_id} -F '\t' '$2 == taxid {{print $3}}' {input.allReadIDs} > {output.taxon_readIDs}
-
-        # 2. Use BBMap to filter the reads.
-        # If include=t: only reads in taxon_readIDs are kept (Extraction)
-        # If include=f: all reads EXCEPT those in taxon_readIDs are kept (Filtering)
-        /usr/bin/time -v filterbyname.sh \
-            -Xmx{params.java_mem}m \
-            in={input.R1} \
-            in2={input.R2} \
-            out={output.R1} \
-            out2={output.R2} \
-            names={output.taxon_readIDs} \
-            include={params.include_flag} \
-            overwrite=f \
-            threads={threads} \
-            zl=6 \
-            2>&1 | tee -a {log}
+        /usr/bin/time -v seqkit grep \
+            {params.grep_flags} \
+            -f {input.taxon_readIDs} \
+            {input.fastq} \
+            -o {output.fastq} \
+            -j {threads} \
+            2>&1 | tee {log}
         """

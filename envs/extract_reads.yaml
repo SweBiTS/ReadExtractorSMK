@@ -5,6 +5,6 @@ channels:
     - conda-forge
     - defaults
 dependencies:
-    - bbmap
+    - seqkit
     - dataclasses
     - stringmeup

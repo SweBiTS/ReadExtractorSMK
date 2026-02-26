@@ -16,4 +16,4 @@ tax_ids_file: "supporting_files/tax_ids.txt"                      # File contain
 mode: clade                                                       # Choose between {single, clade}. 
                                                                   # Single: extract reads hitting exactly the specified tax ID(s).
                                                                   # Clade: extract all reads hitting any taxa in the clade rooted at the specified tax ID(s)
-include: False                                                     # Extract (True) or Filter (False) the reads classified to the specified Tax ID(s).
+include: True                                                     # Extract (True) or Filter (False) the reads classified to the specified Tax ID(s).
